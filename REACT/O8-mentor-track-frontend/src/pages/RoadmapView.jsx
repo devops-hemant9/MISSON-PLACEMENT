@@ -9,6 +9,43 @@ export default function RoadmapView() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const user = JSON.parse(localStorage.getItem('user'));
+
+  const [newTopic, setNewTopic] = useState({ title: '', description: '' });
+
+ const handleAddTopic = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem('token');
+    
+    try {
+      const response = await fetch(`http://localhost:5003/api/roadmaps/${id}/topics`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          title: newTopic.title,
+          description: newTopic.description,
+          order_index: roadmap.topics ? roadmap.topics.length + 1 : 1
+        })
+      });
+      if (!response.ok) throw new Error('Failed to add topic');
+      // Clear the form
+      setNewTopic({ title: '', description: '' });
+      
+      // Refresh the page data by calling the same URL again
+      // A quick hack for now is just reloading the window, or we can fetch again.
+      window.location.reload(); 
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+   const handleChange = (e) => {
+    setNewTopic({ ...newTopic, [e.target.name]: e.target.value });
+  };
+
   // Fetch the roadmap and its topics
   useEffect(() => {
     const fetchRoadmapDetails = async () => {
@@ -84,6 +121,35 @@ export default function RoadmapView() {
             )}
           </div>
         </div>
+
+                {/* Add Topic Form (Only visible to the Mentor who created this roadmap) */}
+        {user?.role === 'mentor' && user?.name === roadmap.mentor_name && (
+          <div className="mt-8 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Add New Topic</h3>
+            <form onSubmit={handleAddTopic} className="flex flex-col gap-4">
+              <input 
+                type="text" 
+                name="title" 
+                value={newTopic.title} 
+                onChange={handleChange} 
+                placeholder="Topic Title (e.g. JWT Authentication)"
+                className="border border-gray-300 p-2 rounded-lg"
+                required
+              />
+              <textarea 
+                name="description" 
+                value={newTopic.description} 
+                onChange={handleChange} 
+                placeholder="What will they learn?"
+                className="border border-gray-300 p-2 rounded-lg"
+                required
+              />
+              <button type="submit" className="bg-blue-600 text-white p-2 rounded-lg font-medium">
+                Add Topic
+              </button>
+            </form>
+          </div>
+        )}
 
       </div>
     </div>
