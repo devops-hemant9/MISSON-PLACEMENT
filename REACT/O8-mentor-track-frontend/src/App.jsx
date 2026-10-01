@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Auth from './pages/Auth';
 import Dashboard from './pages/Dashboard';
+import RoadmapView from './pages/RoadmapView';
 
 // This is a custom wrapper component that checks if a user is logged in
 const ProtectedRoute = ({ children }) => {
@@ -25,6 +26,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/roadmap/:id" 
+            element={
+              <ProtectedRoute>
+                <RoadmapView />
               </ProtectedRoute>
             } 
           />

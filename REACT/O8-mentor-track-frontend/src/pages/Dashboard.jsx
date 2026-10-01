@@ -169,7 +169,12 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {roadmaps.map((v) => (
                 <div key={v.id} className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">{v.title}</h3>
+                 <h3 
+                    onClick={() => navigate(`/roadmap/${v.id}`)}
+                    className="text-lg font-bold text-gray-900 mb-2 cursor-pointer hover:text-blue-600 transition-colors"
+                  >
+                    {v.title}
+                  </h3>
                   <p className="text-gray-600 text-sm mb-4 line-clamp-2">{v.description}</p>
                   <div className="flex items-center justify-between text-sm text-gray-500 border-t pt-3">
                     <span>By {v.mentor_name || 'Mentor'}</span>
