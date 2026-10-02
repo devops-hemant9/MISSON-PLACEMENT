@@ -1,16 +1,102 @@
-# React + Vite
+﻿# 🧭 MentorTrack — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> React + Vite frontend for the MentorTrack platform. Role-aware UI where mentors manage learning roadmaps and students enroll and track their progress.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🚀 Quick Start
 
-## React Compiler
+```bash
+npm install
+npm run dev
+# App runs on http://localhost:5173
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Make sure the backend API is running on `http://localhost:5003` before starting the frontend.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 📁 Project Structure
+
+```
+src/
+├── pages/
+│   ├── Auth.jsx          # Login / Register with role selection
+│   ├── Dashboard.jsx     # Role-aware home page after login
+│   └── RoadmapView.jsx   # Full roadmap detail with topic progress
+├── App.jsx               # Route definitions (React Router)
+├── main.jsx              # Entry point
+└── index.css             # Global styles
+```
+
+---
+
+## 🖥️ Pages
+
+### `Auth.jsx` — Login & Register
+- Toggle between Login and Register mode
+- Role selection on register: `mentor` or `student`
+- On success: stores JWT in `localStorage`, redirects to Dashboard
+
+### `Dashboard.jsx` — Role-Aware Home
+| User Role | What They See |
+|-----------|---------------|
+| **Mentor** | Form to create new roadmaps + list of their roadmaps |
+| **Student** | Browse all public roadmaps + enroll with one click |
+
+### `RoadmapView.jsx` — Roadmap Detail
+- Displays roadmap title, description, and mentor name
+- Lists all topics in order
+- Students can mark individual topics as complete
+- Mentors can add new topics directly from this page
+
+---
+
+## 🔐 Auth Flow
+
+```
+User registers/logs in → receives JWT
+     ↓
+JWT stored in localStorage
+     ↓
+Every API request sends: Authorization: Bearer <token>
+     ↓
+Backend verifies token + role → responds accordingly
+```
+
+On logout: JWT is removed from `localStorage`, user is redirected to `/auth`.
+
+---
+
+## 🔗 API Connection
+
+All requests point to `http://localhost:5003`. Key calls:
+
+| Action | Method | Endpoint |
+|--------|--------|----------|
+| Register | `POST` | `/api/register` |
+| Login | `POST` | `/api/login` |
+| Get roadmaps | `GET` | `/api/roadmaps` |
+| Get roadmap + topics | `GET` | `/api/roadmaps/:id` |
+| Create roadmap | `POST` | `/api/roadmaps` |
+| Add topic | `POST` | `/api/roadmaps/:id/topics` |
+| Enroll | `POST` | `/api/enrollments` |
+| Mark topic done | `POST` | `/api/progress` |
+
+---
+
+## 💻 Tech Stack
+
+| Tool | Purpose |
+|------|---------|
+| React 18 | UI framework |
+| React Router v6 | Client-side routing |
+| Vite | Dev server and bundler |
+| Vanilla CSS | Styling |
+| `fetch` API | HTTP requests to backend |
+
+---
+
+## 🔗 Related
+
+- **Backend API:** [`NODE/O7-mentor-track-backend`](../../NODE/O7-mentor-track-backend)
