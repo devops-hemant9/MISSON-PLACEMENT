@@ -42,6 +42,35 @@ export default function RoadmapView() {
     }
   };
 
+    const handleMarkComplete = async (topicId) => {
+    const token = localStorage.getItem('token');
+    
+    try {
+      const response = await fetch('http://localhost:5003/api/progress', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ topic_id: topicId })
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to mark complete');
+      }
+
+      alert("Topic marked as complete!");
+      // Refresh to show updated UI
+      window.location.reload(); 
+      
+    } catch (err) {
+      alert(err.message);
+      console.error(err);
+    }
+  };
+
+
    const handleChange = (e) => {
     setNewTopic({ ...newTopic, [e.target.name]: e.target.value });
   };
@@ -110,6 +139,15 @@ export default function RoadmapView() {
                     <div>
                       <h3 className="text-lg font-bold text-gray-900">{topic.title}</h3>
                       <p className="text-gray-600 mt-1">{topic.description}</p>
+                    
+                      {user?.role === 'student' && (
+                        <button 
+                          onClick={() => handleMarkComplete(topic.id)}
+                          className="mt-3 text-sm bg-green-50 text-green-700 hover:bg-green-100 px-3 py-1.5 rounded font-medium border border-green-200 transition-colors"
+                        >
+                          ✓ Mark Complete
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}
