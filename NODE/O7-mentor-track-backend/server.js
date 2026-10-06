@@ -170,6 +170,62 @@ app.get('/api/roadmaps/:id', async (req, res) => {
     }
 });
 
+// Get student progress for a specific roadmap
+app.get('/api/roadmaps/:id/progress', verifyToken, async (req, res) => {
+  try {
+    const roadmapId = req.params.id;
+    const userId = req.user.id;
+
+    // Advanced SQL: Count total topics AND completed topics in one query
+        // Advanced SQL: Count total topics AND completed topics in one query
+    const progressQuery = `
+      SELECT 
+        COUNT(t.id)::int AS total_topics,
+        COUNT(tp.id)::int AS completed_topics
+      FROM topics t
+      LEFT JOIN topic_progress tp 
+        ON t.id = tp.topic_id AND tp.student_id = $1
+      WHERE t.roadmap_id = $2;
+    `;
+
+    const result = await pool.query(progressQuery, [userId, roadmapId]);
+    
+    const total = result.rows[0].total_topics;
+    const completed = result.rows[0].completed_topics;
+    const percentage = total === 0 ? 0 : Math.round((completed / total) * 100);
+
+    res.json({ total, completed, percentage });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error fetching progress' });
+  }
+});
+
+// Get a list of completed topic IDs for a specific student
+app.get('/api/roadmaps/:id/completed-topics', verifyToken, async (req, res) => {
+  try {
+    const roadmapId = req.params.id;
+    const studentId = req.user.id;
+
+    const query = `
+      SELECT topic_id 
+      FROM topic_progress tp
+      JOIN topics t ON tp.topic_id = t.id
+      WHERE tp.student_id = $1 AND t.roadmap_id = $2;
+    `;
+    
+    const result = await pool.query(query, [studentId, roadmapId]);
+    
+    // Map the result rows into a simple array of IDs: [1, 4, 5]
+    const completedIds = result.rows.map(row => row.topic_id);
+    
+    res.json(completedIds);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error fetching completed topics' });
+  }
+});
+
 // POST — Create a roadmap (mentors only)
 app.post('/api/roadmaps', verifyToken, isMentor, async (req, res) => {
     try {

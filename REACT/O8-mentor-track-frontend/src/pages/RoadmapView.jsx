@@ -9,6 +9,10 @@ export default function RoadmapView() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const [progress, setProgress] = useState(null);
+
+  const [completedTopics, setCompletedTopics] = useState([]);
+
   const user = JSON.parse(localStorage.getItem('user'));
 
   const [newTopic, setNewTopic] = useState({ title: '', description: '' });
@@ -87,6 +91,28 @@ export default function RoadmapView() {
 
         const data = await response.json();
         setRoadmap(data); // data contains the roadmap info AND an array of topics
+
+                // Fetch progress only if the user is a student
+        const user = JSON.parse(localStorage.getItem('token') ? localStorage.getItem('user') : null);
+        if (user && user.role === 'student') {
+          const token = localStorage.getItem('token');
+          const progRes = await fetch(`http://localhost:5003/api/roadmaps/${id}/progress`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (progRes.ok) {
+            const progData = await progRes.json();
+            setProgress(progData);
+          }
+
+           // Fetch completed topic IDs
+        const compRes = await fetch(`http://localhost:5003/api/roadmaps/${id}/completed-topics`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (compRes.ok) {
+          const compData = await compRes.json();
+          setCompletedTopics(compData);
+        }
+        }
         
       } catch (err) {
         setError(err.message);
@@ -120,6 +146,24 @@ export default function RoadmapView() {
           <div className="mt-4 pt-4 border-t border-gray-100 text-sm text-gray-500">
             Created by {roadmap.mentor_name}
           </div>
+
+                  {/* Progress Bar (Only visible to Students) */}
+        {user?.role === 'student' && progress && (
+          <div className="mt-6 pt-6 border-t border-gray-100">
+            <div className="flex justify-between text-sm font-medium text-gray-700 mb-2">
+              <span>Your Progress</span>
+              <span>{progress.percentage}% ({progress.completed}/{progress.total} Topics)</span>
+            </div>
+            {/* The background track */}
+            <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+              {/* The actual progress fill */}
+              <div 
+                className="bg-blue-600 h-2.5 rounded-full transition-all duration-500" 
+                style={{ width: `${progress.percentage}%` }}
+              ></div>
+            </div>
+          </div>
+        )}
         </div>
 
         {/* Topics List */}
@@ -133,20 +177,28 @@ export default function RoadmapView() {
               <div className="space-y-4">
                 {roadmap.topics.map((topic, index) => (
                   <div key={topic.id} className="flex gap-4 p-4 border border-gray-200 rounded-lg">
-                    <div className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold">
+                    <div className="shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold">
                       {index + 1}
                     </div>
                     <div>
                       <h3 className="text-lg font-bold text-gray-900">{topic.title}</h3>
                       <p className="text-gray-600 mt-1">{topic.description}</p>
                     
-                      {user?.role === 'student' && (
-                        <button 
-                          onClick={() => handleMarkComplete(topic.id)}
-                          className="mt-3 text-sm bg-green-50 text-green-700 hover:bg-green-100 px-3 py-1.5 rounded font-medium border border-green-200 transition-colors"
-                        >
-                          ✓ Mark Complete
-                        </button>
+                                            {user?.role === 'student' && (
+                        <div className="mt-3">
+                          {completedTopics.includes(topic.id) ? (
+                            <span className="text-sm text-green-700 font-bold flex items-center">
+                              ✓ Completed
+                            </span>
+                          ) : (
+                            <button 
+                              onClick={() => handleMarkComplete(topic.id)}
+                              className="text-sm bg-green-50 text-green-700 hover:bg-green-100 px-3 py-1.5 rounded font-medium border border-green-200 transition-colors"
+                            >
+                              Mark Complete
+                            </button>
+                          )}
+                        </div>
                       )}
                     </div>
                   </div>
