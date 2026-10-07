@@ -1,27 +1,8 @@
 {
-  "name": "misson-placement",
+  "name": "misson-placement-proxy",
   "version": "1.0.0",
-  "description": "this reposetory contains all mine journey to be an PERN stack developer as sonn as possible",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/task-masterr01/MISSON-PLACEMENT.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/task-masterr01/MISSON-PLACEMENT/issues"
-  },
-  "homepage": "https://github.com/task-masterr01/MISSON-PLACEMENT#readme",
-  "dependencies": {
-    "cors": "^2.8.6",
-    "express": "^5.2.1",
-    "pg": "^8.23.0",
-    "react-router-dom": "^7.18.4"
+    "install": "cd NODE/O7-mentor-track-backend && npm install",
+    "start": "cd NODE/O7-mentor-track-backend && node index.js"
   }
 }
