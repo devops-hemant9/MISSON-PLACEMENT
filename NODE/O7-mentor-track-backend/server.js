@@ -16,6 +16,11 @@ const pool = new Pool({
 app.use(cors());
 app.use(express.json());
 
+// Health Check Route for Railway
+app.get('/', (req, res) => {
+    res.status(200).send('MentorTrack API is running');
+});
+
 // ==========================================
 // MIDDLEWARE: Verify JWT Token
 // ==========================================
