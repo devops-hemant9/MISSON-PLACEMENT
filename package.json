@@ -2,7 +2,7 @@
   "name": "misson-placement-proxy",
   "version": "1.0.0",
   "scripts": {
-    "start": "cd NODE/O7-mentor-track-backend && node index.js"
+    "start": "node NODE/O7-mentor-track-backend/index.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
