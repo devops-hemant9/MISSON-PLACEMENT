@@ -310,6 +310,11 @@ app.post('/api/progress', verifyToken, async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`MentorTrack server running on http://localhost:${PORT}`);
+// Basic health check route for Railway
+app.get('/', (req, res) => {
+    res.send('MentorTrack API is running');
+});
+
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`MentorTrack server running on port ${PORT}`);
 });
